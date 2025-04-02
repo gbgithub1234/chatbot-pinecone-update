@@ -59,12 +59,17 @@ if submit_button:
             query=prompt, chat_history=st.session_state["chat_history"]
         )
 
-        source_docs = generated_response.get("source_documents", [])
-        sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
+        if isinstance(generated_response, dict):
+            source_docs = generated_response.get("source_documents", [])
+            sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
+            answer = generated_response.get("answer", "")
+        else:
+            source_docs = []
+            sources = set()
+            answer = generated_response  # fallback to raw string
+        
+        formatted_response = f"{answer} \n\n {create_sources_string(sources)}"
 
-        formatted_response = (
-            f"{generated_response.get('answer', generated_response)} \n\n {create_sources_string(sources)}"
-        )
 
         message(prompt, is_user=True)
         message(formatted_response)

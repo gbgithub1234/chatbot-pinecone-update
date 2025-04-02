@@ -11,15 +11,7 @@ import pinecone
 from consts import INDEX_NAME
 
 
-pinecone.init(
-    api_key=st.secrets["PINECONE_API_KEY"],
-    #environment=st.secrets["PINECONE_ENVIRONMENT_REGION"],
-    environment="us-east-1",  # required for serverless
 
-    
-    # api_key=os.environ["PINECONE_API_KEY"],
-    # environment=os.environ["PINECONE_ENVIRONMENT_REGION"],
-)
 
 
 def run_llm(query: str, chat_history: List[Dict[str, Any]]=[]) -> Any:

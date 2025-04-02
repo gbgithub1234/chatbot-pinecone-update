@@ -19,7 +19,6 @@ multiline_str1 = """
 - leverages AI and [Pinecone vector storage](%s) """ % url2
 
 multiline_str2 = """to access these [sample documents](%s)""" % url
-
 multiline_str3 ="""\n - sample prompt: 'How can I create a marketing effort?' \n"""
 
 with st.expander("Show/hide details"):
@@ -49,6 +48,10 @@ def create_sources_string(source_urls: Set[str]) -> str:
         sources_string += f"{i+1}. {source}\n"
     return sources_string
 
+#------------------------------------------
+# Main user form
+#------------------------------------------
+
 with st.form(key='myform', clear_on_submit=True):
     prompt = st.text_input("Prompt", placeholder="Enter your prompt here..")
     submit_button = st.form_submit_button("Submit")
@@ -67,16 +70,21 @@ if submit_button:
             source_docs = []
             sources = set()
             answer = generated_response  # fallback to raw string
-        
-        formatted_response = f"{answer} \n\n {create_sources_string(sources)}"
 
+        formatted_response = f"{answer} \n\n {create_sources_string(sources)}"
 
         message(prompt, is_user=True)
         message(formatted_response)
 
         st.session_state["user_prompt_history"].append(prompt)
         st.session_state["chat_answers_history"].append(formatted_response)
-        st.session_state["chat_history"].append((prompt, generated_response.get("answer", "")))
+
+        if isinstance(generated_response, dict):
+            response_text = generated_response.get("answer", "")
+        else:
+            response_text = generated_response
+
+        st.session_state["chat_history"].append((prompt, response_text))
 
 #------------------------------------------
 # Temporary Diagnostic: Direct Vector Retrieval Test

@@ -49,79 +49,48 @@ def create_sources_string(source_urls: Set[str]) -> str:
     return sources_string
 
 #------------------------------------------
-# Main user form
+# Main chatbot UI
 #------------------------------------------
 
 with st.form(key='myform', clear_on_submit=True):
-    prompt = st.text_input("Prompt", placeholder="Enter your prompt here..")
+    prompt = st.text_input("Prompt", placeholder="Enter your prompt here...")
     submit_button = st.form_submit_button("Submit")
 
 if submit_button:
-    with st.spinner("Generating response.."):
-        generated_response = run_llm(
-            query=prompt, chat_history=st.session_state["chat_history"]
-        )
+    with st.spinner("Generating response..."):
+        try:
+            generated_response = run_llm(
+                query=prompt, chat_history=st.session_state["chat_history"]
+            )
 
-        if isinstance(generated_response, dict):
-            source_docs = generated_response.get("source_documents", [])
-            sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
-            answer = generated_response.get("answer", "")
-        else:
-            source_docs = []
-            sources = set()
-            answer = generated_response  # fallback to raw string
+            if isinstance(generated_response, dict):
+                source_docs = generated_response.get("source_documents", [])
+                sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
+                answer = generated_response.get("answer", "[No answer generated]")
+            else:
+                source_docs = []
+                sources = set()
+                answer = generated_response if generated_response else "[No answer generated]"
 
-        formatted_response = f"{answer} \n\n {create_sources_string(sources)}"
+            formatted_response = f"{answer} \n\n {create_sources_string(sources)}"
 
-        message(prompt, is_user=True)
-        message(formatted_response)
+            message(prompt, is_user=True)
+            message(formatted_response)
 
-        st.session_state["user_prompt_history"].append(prompt)
-        st.session_state["chat_answers_history"].append(formatted_response)
+            st.session_state["user_prompt_history"].append(prompt)
+            st.session_state["chat_answers_history"].append(formatted_response)
+            st.session_state["chat_history"].append((prompt, answer))
 
-        if isinstance(generated_response, dict):
-            response_text = generated_response.get("answer", "")
-        else:
-            response_text = generated_response
-
-        st.session_state["chat_history"].append((prompt, response_text))
+        except Exception as e:
+            st.error(f"An error occurred during response generation: {e}")
 
 #------------------------------------------
-# Temporary Diagnostic: Direct Vector Retrieval Test
+# Vector search test (now commented out)
 #------------------------------------------
 
-with st.expander("Run Vector Search Test"):
-    if st.button("Run test: What is a marketing plan"):
-        with st.spinner("Running similarity search..."):
-            try:
-                from pinecone import Pinecone as PineconeClient
-                from langchain.embeddings.openai import OpenAIEmbeddings
-                from langchain_community.vectorstores import Pinecone as LangchainPinecone
-    
-                pc = PineconeClient(api_key=st.secrets["PINECONE_API_KEY"])
-                index = pc.Index(INDEX_NAME)
-    
-                embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
-    
-                docsearch = LangchainPinecone.from_existing_index(
-                    index_name=INDEX_NAME,
-                    embedding=embeddings
-                )
-    
-                query = "What is a marketing plan"
-                results = docsearch.similarity_search(query, k=5)
-    
-                if results:
-                    st.subheader("Top matching documents for:")
-                    st.markdown(f"**Query:** {query}")
-                    for i, doc in enumerate(results):
-                        st.markdown(f"**Result {i+1}:**")
-                        st.write(doc.page_content)
-                        if doc.metadata:
-                            st.caption(f"📄 Source: {doc.metadata.get('source', 'Unknown')}")
-                else:
-                    st.warning("No matching documents found.")
-    
-            except Exception as e:
-                st.error(f"An error occurred: {e}")
-
+# with st.expander("Run Vector Search Test"):
+#     if st.button("Run test: What is a marketing plan"):
+#         with st.spinner("Running similarity search..."):
+#             try:
+#                 from pinecone import Pinecone as PineconeClient
+#                 from

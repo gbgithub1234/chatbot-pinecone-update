@@ -59,13 +59,11 @@ if submit_button:
             query=prompt, chat_history=st.session_state["chat_history"]
         )
 
-        sources = set(
-            source_docs = generated_response.get("source_documents", []),
-            sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
-        )
+        source_docs = generated_response.get("source_documents", [])
+        sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
 
         formatted_response = (
-            f"{generated_response['answer']} \n\n {create_sources_string(sources)}"
+            f"{generated_response.get('answer', generated_response)} \n\n {create_sources_string(sources)}"
         )
 
         message(prompt, is_user=True)
@@ -73,7 +71,7 @@ if submit_button:
 
         st.session_state["user_prompt_history"].append(prompt)
         st.session_state["chat_answers_history"].append(formatted_response)
-        st.session_state["chat_history"].append((prompt, generated_response["answer"]))
+        st.session_state["chat_history"].append((prompt, generated_response.get("answer", "")))
 
 #------------------------------------------
 # Temporary Diagnostic: Direct Vector Retrieval Test

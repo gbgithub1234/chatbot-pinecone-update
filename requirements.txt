@@ -1,5 +1,5 @@
 langchain~=0.0.321
-pinecone-client>=3.0.0
+pinecone-client==3.0.1
 streamlit_chat
 openai==0.27.8
 tiktoken

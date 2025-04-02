@@ -43,7 +43,8 @@ def run_llm(query: str, chat_history: List[Dict[str, Any]] = []) -> Any:
         })
 
         # Log what actually came back
-        st.write("Raw result from LangChain:", result)
+        #st.write("Raw result from LangChain:", result) 
+        #disabling this for now - GB
 
         return result or {"answer": "[LangChain returned no result]", "source_documents": []}
 

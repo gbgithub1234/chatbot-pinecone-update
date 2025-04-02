@@ -60,7 +60,7 @@ if submit_button:
         )
 
         sources = set(
-            source_docs = generated_response.get("source_documents", [])
+            source_docs = generated_response.get("source_documents", []),
             sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
         )
 

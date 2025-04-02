@@ -38,7 +38,7 @@ with st.expander("Show/hide details"):
     # st.write("- documents which have been ingested are located [here](%s)" % url)
 
 #------------------------------------------
-st.header("SFU Document Chatbot 1.1 (beta)")
+st.header("SFU Document Chatbot 1.2 (beta)")
 
 
 if "user_prompt_history" not in st.session_state:

@@ -91,32 +91,37 @@ if submit_button:
 #------------------------------------------
 
 with st.expander("Run Vector Search Test"):
-    if st.button("Run test: academic probation"):
+    if st.button("Run test: What is a marketing plan"):
         with st.spinner("Running similarity search..."):
             try:
                 from pinecone import Pinecone as PineconeClient
                 from langchain.embeddings.openai import OpenAIEmbeddings
                 from langchain_community.vectorstores import Pinecone as LangchainPinecone
-
+    
                 pc = PineconeClient(api_key=st.secrets["PINECONE_API_KEY"])
                 index = pc.Index(INDEX_NAME)
-
+    
                 embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
-
+    
                 docsearch = LangchainPinecone.from_existing_index(
                     index_name=INDEX_NAME,
                     embedding=embeddings
                 )
-
-                results = docsearch.similarity_search("academic probation", k=5)
-
+    
+                query = "What is a marketing plan"
+                results = docsearch.similarity_search(query, k=5)
+    
                 if results:
-                    st.subheader("Top matching documents:")
+                    st.subheader("Top matching documents for:")
+                    st.markdown(f"**Query:** {query}")
                     for i, doc in enumerate(results):
                         st.markdown(f"**Result {i+1}:**")
                         st.write(doc.page_content)
+                        if doc.metadata:
+                            st.caption(f"📄 Source: {doc.metadata.get('source', 'Unknown')}")
                 else:
                     st.warning("No matching documents found.")
-
+    
             except Exception as e:
                 st.error(f"An error occurred: {e}")
+

@@ -30,8 +30,24 @@ def run_llm(query: str, chat_history: List[Dict[str, Any]] = []) -> Any:
         openai_api_key=st.secrets["OPENAI_API_KEY"]
     )
 
-    qa = ConversationalRetrievalChain.from_llm(
+    qa_chain = ConversationalRetrievalChain.from_llm(
         llm=chat,
         retriever=docsearch.as_retriever(),
         return_source_documents=True
     )
+
+    try:
+        result = qa_chain({
+            "question": query,
+            "chat_history": chat_history
+        })
+
+        # Log what actually came back
+        st.write("Raw result from LangChain:", result)
+
+        return result or {"answer": "[LangChain returned no result]", "source_documents": []}
+
+    except Exception as e:
+        st.error(f"Error in LLM chain: {e}")
+        return {"answer": "[Error occurred during LLM processing]", "source_documents": []}
+

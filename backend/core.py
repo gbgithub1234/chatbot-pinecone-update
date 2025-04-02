@@ -30,4 +30,8 @@ def run_llm(query: str, chat_history: List[Dict[str, Any]] = []) -> Any:
         openai_api_key=st.secrets["OPENAI_API_KEY"]
     )
 
-    qa = ConversationalRetrievalChain.from_llm_
+    qa = ConversationalRetrievalChain.from_llm(
+        llm=chat,
+        retriever=docsearch.as_retriever(),
+        return_source_documents=True
+    )

@@ -60,7 +60,8 @@ if submit_button:
         )
 
         sources = set(
-            [doc.metadata["source"] for doc in generated_response["source_documents"]]
+            source_docs = generated_response.get("source_documents", [])
+            sources = set(doc.metadata.get("source", "Unknown") for doc in source_docs)
         )
 
         formatted_response = (

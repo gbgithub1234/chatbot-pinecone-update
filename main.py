@@ -25,7 +25,7 @@ with st.expander("Show/hide details"):
     st.write(multiline_str1 + multiline_str2 + multiline_str3)
 
 #------------------------------------------
-st.header("SFU Document Chatbot 1.1 (beta)")
+st.header("SFU Document Chatbot 1.2 (beta)")
 
 if "user_prompt_history" not in st.session_state:
     st.session_state["user_prompt_history"] = []
